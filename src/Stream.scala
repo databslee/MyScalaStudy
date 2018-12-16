@@ -114,7 +114,7 @@ object Stream {
   // Run
   def main(args: Array[String]): Unit = {
     // 5.1
-    val s = Stream(1,2,3,4)
+    val s = Stream(1,2,3,4).take(2)
     println(s.toList)
   }
 }
