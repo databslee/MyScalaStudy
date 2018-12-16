@@ -3,22 +3,6 @@ case object Nil extends List[Nothing]
 case class Cons[+A](head: A, tail: List[A]) extends List[A]
 
 object List {
-  def main(args: Array[String]): Unit = {
-
-    var z : List[Nothing] = Nil
-
-    println(sum(List(1,2,3,4)))
-
-    // 3.1
-    val x = List(1,2,3,4,5) match {
-      case Cons(x, Cons(2, Cons(4, _))) => x
-      case Nil => 42
-      case Cons(x, Cons(y, Cons(3, Cons(4, _)))) => x + y
-      case Cons(h, t) => h + sum(t)
-      case _ => 101
-    }
-
-  }
 
   def sum(ints: List[Int]): Int = ints match {
     case Nil => 0
@@ -44,6 +28,7 @@ object List {
       case nil => nil
       case Cons(_, t) => Cons(h, t)
     }
+  }
 
   // 3.4
   def drop[A](l: List[A], n: Int): List[A] = {
@@ -90,12 +75,6 @@ object List {
 
   def product2(ns: List[Double]) =
     foldRight(ns, 1.0)(_ * _)
-
-
-  }
-
-
-
 
   def length[A](l: List[A]): Int = ???
 
