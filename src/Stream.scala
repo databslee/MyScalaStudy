@@ -64,41 +64,33 @@ trait Stream[+A] {
   def flatMap[B](f: A => Stream[B]): Stream[B] =
     foldRight(empty[B])((h,t) => f(h) append t)
 
-  // 5.8
+  //5-8
   def constant[A](a: A): Stream[A] = {
-    lazy val tail: Stream[A] = Cons(() => a, () => tail)
-    tail
+    cons(a, constant(a))
   }
 
-  // 5.9
-  def from(n: Int): Stream[Int] =
+  //5-9
+  def from(n: Int): Stream[Int] = {
     cons(n, from(n+1))
+  }
 
-  // 5.11
-  def unfold[A, S](z: S)(f: S => Option[(A, S)]): Stream[A] =
-    f(z) match {
-      case Some((h,s)) => cons(h, unfold(s)(f))
-      case None => empty
-    }
+  //5-10
+  def fibs() : Stream[Int] = {
+    def go(f0: Int, f1 :Int) : Stream[Int] =
+      cons(f0, go(f1, f0 + f1))
+    go(0, 1)
+  }
 
-
-
-
-  def startsWith[B](s: Stream[B]): Boolean = ???
-
-  def foldRight[B](z: => B)(f: (A, => B) => B): B = // The arrow `=>` in front of the argument type `B` means that the function `f` takes its second argument by name and may choose not to evaluate it.
+  // 책에서 구현한거 1
+  def foldRight[B](z: => B)(f: (A, => B) => B): B =
     this match {
-      case Cons(h,t) => f(h(), t().foldRight(z)(f)) // If `f` doesn't evaluate its second argument, the recursion never occurs.
+      case Cons(h,t) => f(h(), t().foldRight(z)(f))
       case _ => z
     }
 
+  // 책에서 구현한거 2
   def exists(p: A => Boolean): Boolean =
-    foldRight(false)((a, b) => p(a) || b) // Here `b` is the unevaluated recursive step that folds the tail of the stream. If `p(a)` returns `true`, `b` will never be evaluated and the computation terminates early.
-
-  final def find(f: A => Boolean): Option[A] = this match {
-    case Empty => None
-    case Cons(h, t) => if (f(h())) Some(h()) else t().find(f)
-  }
+    foldRight(false)((a, b) => p(a) || b)
 }
 case object Empty extends Stream[Nothing]
 case class Cons[+A](h: () => A, t: () => Stream[A]) extends Stream[A]
@@ -111,6 +103,7 @@ object Stream {
   }
   def empty[A]: Stream[A] = Empty
   def apply[A](as: A*): Stream[A] = if (as.isEmpty) empty else cons(as.head, apply(as.tail: _*))
+
   // Run
   def main(args: Array[String]): Unit = {
     // 5.1
