@@ -6,11 +6,11 @@ trait Stream[+A] {
   def toList: List[A] = {
     def go(s: Stream[A], acc: List[A]): List[A] = s match {
       case Cons(h,t) => {
-        println("1" , acc)
+        //println("1" , acc)
         go(t(), h() :: acc)
       }
       case _ => {
-        println("2" , acc)
+        //println("2" , acc)
         acc
       }
     }
@@ -26,7 +26,7 @@ trait Stream[+A] {
 
   def drop(n: Int): Stream[A] = this match {
     case Cons(_, t) if n > 0 => t().drop(n - 1)
-    case _ => this
+    case _ => this // not empty
   }
 
   // 5.3
@@ -64,21 +64,21 @@ trait Stream[+A] {
   def flatMap[B](f: A => Stream[B]): Stream[B] =
     foldRight(empty[B])((h,t) => f(h) append t)
 
-  //5-8
+  // 5.8
   def constant[A](a: A): Stream[A] = {
     cons(a, constant(a))
   }
 
-  //5-9
+  // 5.9
   def from(n: Int): Stream[Int] = {
     cons(n, from(n+1))
   }
 
-  //5-10
+  // 5.10
   def fibs() : Stream[Int] = {
-    def go(f0: Int, f1 :Int) : Stream[Int] =
-      cons(f0, go(f1, f0 + f1))
-    go(0, 1)
+    def fib(f0: Int, f1 :Int) : Stream[Int] =
+      cons(f0, fib(f1, f0 + f1))
+    fib(0, 1)
   }
 
   // 책에서 구현한거 1
@@ -106,8 +106,42 @@ object Stream {
 
   // Run
   def main(args: Array[String]): Unit = {
+    val s = Stream(1,2,3,4,5,6,7,8,9,10)
     // 5.1
-    val s = Stream(1,2,3,4).take(2)
-    println(s.toList)
+    println("5.1", s.toList)
+
+    // 5.2
+    println("5.2", s.take(8).toList)
+    println("5.2", s.drop(3).toList)
+
+    // 5.3
+    println("5.3", s.takeWhile(_ < 4).toList)
+
+    // 5.4
+    println("5.4", s.forAll(_ < 20))
+    println("5.4", s.forAll(_ > 10))
+
+    // 5.5
+    println("5.5", s.takeWhile2(_ < 4).toList)
+
+    // 5.6
+    println("5.6", s.drop(4).headOption)
+
+    // 5.7
+    println("5.7", s.map(_ + 10).toList)
+    println("5.7", s.map(_ + 10).filter(_ > 15).toList)
+    println("5.7", s.map(_ + 10).append(Stream(20,30)).toList)
+
+    val a = Stream(Stream(1,2,3), Stream(4,5,6), Stream(7,8,9))
+    println("5.7", a.flatMap(_.map(_ + 10)).toList)
+
+    // 5.8
+    //println("5.8", s.constant(10).toList)
+
+    // 5.9
+    //println("5.9", s.from(1).toList)
+
+    // 5.10
+    println("5.10", s.fibs())
   }
 }
